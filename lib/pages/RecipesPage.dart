@@ -21,9 +21,9 @@ class _RecipeState extends State<RecipesPage> {
                     children: <Widget>[
                         const ListTile(
                             leading: Icon(Icons.album),
-                            title: Text('The Enchanted Nightingale'),
+                            title: Text('Title'),
                             subtitle: Text(
-                                'Music by Julie Gable. Lyrics by Sidney Stein.'),
+                                'A really nice subtitle'),
                         ),
                     ],
                 ),

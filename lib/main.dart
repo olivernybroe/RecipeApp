@@ -31,6 +31,7 @@ class _HomeState extends State<Home> {
     /// 2: Shopping list
     int _page = 0;
 
+
   @override
   Widget build(BuildContext context) {
       return Scaffold(
@@ -42,7 +43,8 @@ class _HomeState extends State<Home> {
                       ),
                   ),
                   Container(color: Colors.blue),
-                  Container(color: Colors.grey)
+                  Container(color: Colors.grey),
+                  Container(color: Colors.yellow),
               ],
 
               /// Specify the page controller
@@ -50,6 +52,7 @@ class _HomeState extends State<Home> {
               onPageChanged: onPageChanged
           ),
           bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               items: [
                   BottomNavigationBarItem(
                       icon: Icon(Icons.book),
@@ -62,7 +65,11 @@ class _HomeState extends State<Home> {
                   BottomNavigationBarItem(
                       icon: Icon(Icons.shopping_cart),
                       title: Text('Shopping List')
-                  )
+                  ),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      title: Text("works"),
+                  ),
               ],
               onTap: navigationTapped,
               currentIndex: _page,
