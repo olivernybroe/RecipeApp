@@ -1,4 +1,4 @@
-package dk.lostworld.recipe;
+package dk.lost_world.meal_engineer;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

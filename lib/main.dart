@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recipe/pages/RecipesPage.dart';
+import 'package:MealEngineer/pages/RecipesPage.dart';
 
 void main() {
   runApp(MyApp());
