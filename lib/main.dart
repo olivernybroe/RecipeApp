@@ -1,3 +1,6 @@
+import 'package:MealEngineer/pages/ExplorePage.dart';
+import 'package:MealEngineer/pages/PlanPage.dart';
+import 'package:MealEngineer/pages/ShoppingListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/pages/RecipesPage.dart';
 
@@ -42,9 +45,21 @@ class _HomeState extends State<Home> {
                           child: RecipesPage()
                       ),
                   ),
-                  Container(color: Colors.blue),
-                  Container(color: Colors.grey),
-                  Container(color: Colors.yellow),
+                  Container(
+                      child: SafeArea(
+                          child: PlanPage()
+                      ),
+                  ),
+                  Container(
+                      child: SafeArea(
+                          child: ShoppingListPage()
+                      ),
+                  ),
+                  Container(
+                      child: SafeArea(
+                          child: ExplorePage()
+                      ),
+                  ),
               ],
 
               /// Specify the page controller
