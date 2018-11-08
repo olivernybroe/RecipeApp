@@ -3,6 +3,8 @@ import 'package:MealEngineer/pages/PlanPage.dart';
 import 'package:MealEngineer/pages/ShoppingListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/pages/RecipesPage.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   runApp(MyApp());
@@ -116,6 +118,8 @@ class _HomeState extends State<Home> {
     @override
     void initState() {
         super.initState();
+        initializeDateFormatting();
+
         _pageController = PageController();
     }
 
