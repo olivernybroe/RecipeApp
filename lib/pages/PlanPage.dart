@@ -36,16 +36,45 @@ class _PlanState extends State<PlanPage> with AutomaticKeepAliveClientMixin<Plan
                         bottom: _buildTabBar(context)
                     ),
                     body: TabBarView(
-                        children: List.generate(Plan.now().days.length, (index) {
-                            return  Column(
-                                children: <Widget>[
-                                    Text(DateFormat.E().format(Plan.now().days[index].day)),
-                                    Text(DateFormat('d/M').format(Plan.now().days[index].day)),
-                                ],
-                            );
-                        }),
-                    ),
+                        children: Plan.now().days.map((day) {
+                            return ListView.builder(
+                                itemCount: MealType.values.length,
+                                itemBuilder: (BuildContext context, int index){
+                                    var mealType = MealType.values[index];
+                                    return Column(
+                                        children: <Widget>[
+                                            Text(
+                                                mealType.toString().substring(mealType.toString().indexOf('.')+1),
+                                                style: TextStyle(
+                                                    //decoration: TextDecoration.underline,
+                                                    fontSize: 30.0,
+                                                    fontWeight: FontWeight.bold
+                                                ),
+                                            ),
+                                            Column(
+                                                children: day.meals.where((meal) => meal.mealType == mealType).map((meal) {
+                                                    return Card(
+                                                        child: Column(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: <Widget>[
+                                                                ListTile(
+                                                                    leading: Icon(Icons.album),
+                                                                    title: Text(meal.recipe.name),
+                                                                    subtitle: Text(
+                                                                        'A really nice subtitle'),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    );
+                                                }).toList(),
+                                            )
 
+                                        ],
+                                    );
+                                }
+                            );
+                        }).toList(),
+                    ),
                 ),
             ),
         );
@@ -60,15 +89,9 @@ class _PlanState extends State<PlanPage> with AutomaticKeepAliveClientMixin<Plan
                     child: Column(
                         children: <Widget>[
                             Text(DateFormat.E().format(Plan.now().days[index].day)),
-                            Text(
-                                DateFormat('d/M').format(Plan.now().days[index].day),
-                                style: TextStyle(
-                                    fontSize: 8.0
-                                ),
-                            ),
+                            Text(DateFormat('d/M').format(Plan.now().days[index].day)),
                         ],
                     ),
-                   //text: DateFormat.E().format(Plan.now().days[index].day) //tabNames[Plan.now().days[index].day.weekday-1]
                 );
             }, growable: true),
         );
