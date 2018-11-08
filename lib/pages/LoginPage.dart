@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
 
 
+
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -18,13 +19,49 @@ class LoginPage extends StatefulWidget {
 class _LoginState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: new RaisedButton(onPressed: () {
-          _handleSignIn()
-              .then((FirebaseUser user) => print(user))
-              .catchError((e) => print(e));
-        },));
+    return new Scaffold(
+
+
+      body: Center(
+
+
+        child: new Column(
+          children: <Widget>[
+
+            Text(
+              'Recipe App',
+              style: TextStyle(decoration: TextDecoration.underline),
+            ),
+
+            new RaisedButton(
+                child: new Text('Login with Google'),
+                onPressed: () {
+                  _handleSignIn()
+                      .then((FirebaseUser user) => print(user))
+                      .catchError((e) => print(e));
+                }
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
+
+      /*Container(
+      decoration: BoxDecoration(color: Colors.blue[500]),
+        child: Center(
+          child:
+            new RaisedButton(
+              child: new Text('Login with Google'),
+                onPressed: () {
+              _handleSignIn()
+                  .then((FirebaseUser user) => print(user))
+                  .catchError((e) => print(e));
+            }),
+        )
+    );*/
+
 
   Future<FirebaseUser> _handleSignIn() async {
     GoogleSignInAccount googleUser = await _googleSignIn.signIn();
