@@ -1,4 +1,5 @@
 import 'package:MealEngineer/pages/ExplorePage.dart';
+import 'package:MealEngineer/pages/LoginPage.dart';
 import 'package:MealEngineer/pages/PlanPage.dart';
 import 'package:MealEngineer/pages/ShoppingListPage.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _HomeState extends State<Home> {
                   ),
                   Container(
                       child: SafeArea(
-                          child: ExplorePage()
+                          child: LoginPage()
                       ),
                   ),
               ],
