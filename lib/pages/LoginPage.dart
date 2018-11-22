@@ -1,12 +1,8 @@
+import 'package:MealEngineer/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-
-
-
-final GoogleSignIn _googleSignIn = GoogleSignIn();
-final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -19,31 +15,55 @@ class _LoginState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: null,
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SignInButton(
-                Buttons.Google,
-                onPressed: () {
-                    _handleSignIn()
-                        .then((FirebaseUser user) => print(user))
-                        .catchError((e) => print(e));
-                },
+              Buttons.Google,
+              onPressed: () {
+                _handleGoogleSignIn()
+                    .then((FirebaseUser user) => print(user))
+                    .catchError((e) => print(e));
+              },
             ),
+            RaisedButton(
+                child: Text('Continue without login'),
+                onPressed: () => _handleAnonymousSignIn(),
+            ),
+            RaisedButton(
+                child: Text('Logout'),
+              onPressed: () {
+                _handleSignOut()
+                    .then((user) => print("sign out"))
+                    .catchError((e) => print(e));
+              },
+            )
           ],
         ),
       ),
     );
   }
 
-  Future<FirebaseUser> _handleSignIn() async {
-      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      FirebaseUser user = await _auth.signInWithGoogle(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-      );
-      print("signed in " + user.displayName);
-      return user;
+  Future<FirebaseUser> _handleGoogleSignIn() async {
+    GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    FirebaseUser user = await auth.signInWithGoogle(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    print("signed in " + user.displayName);
+    return user;
+  }
+
+  Future<FirebaseUser> _handleAnonymousSignIn() async {
+    FirebaseUser user = await auth.signInAnonymously();
+    return user;
+  }
+
+  Future _handleSignOut() async {
+    await googleSignIn.signOut();
+    return auth.signOut();
   }
 }
