@@ -1,4 +1,5 @@
 import 'package:MealEngineer/Models/Plan.dart';
+import 'package:MealEngineer/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
@@ -53,19 +54,7 @@ class _PlanState extends State<PlanPage> with AutomaticKeepAliveClientMixin<Plan
                                             ),
                                             Column(
                                                 children: day.meals.where((meal) => meal.mealType == mealType).map((meal) {
-                                                    return Card(
-                                                        child: Column(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: <Widget>[
-                                                                ListTile(
-                                                                    leading: Icon(Icons.album),
-                                                                    title: Text(meal.recipe.name),
-                                                                    subtitle: Text(
-                                                                        'A really nice subtitle'),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    );
+                                                    return RecipeCard(meal.recipe);
                                                 }).toList(),
                                             )
 

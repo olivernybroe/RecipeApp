@@ -1,3 +1,4 @@
+import 'package:MealEngineer/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
@@ -60,19 +61,7 @@ class _RecipeState extends State<RecipesPage> {
     Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
         final recipe = Recipe.fromSnapshot(data);
 
-        return Card(
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                    ListTile(
-                        leading: Icon(Icons.album),
-                        title: Text(recipe.name),
-                        subtitle: Text(
-                            'A really nice subtitle'),
-                    ),
-                ],
-            ),
-        );
+        return RecipeCard(recipe);
     }
 
 }
