@@ -9,3 +9,5 @@
 /captures
 GeneratedPluginRegistrant.java
 /app/google-services.json
+/key.properties
+/api-*.json
