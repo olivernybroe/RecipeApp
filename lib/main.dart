@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
                       title: Text('Recipes')
                   ),
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.calendar_today),
+                      icon: Icon(Icons.event),
                       title: Text('Plan')
                   ),
                   BottomNavigationBarItem(
@@ -84,8 +84,8 @@ class _HomeState extends State<Home> {
                       title: Text('Shopping List')
                   ),
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      title: Text("works"),
+                      icon: Icon(Icons.public),
+                      title: Text("Explore"),
                   ),
               ],
               onTap: navigationTapped,

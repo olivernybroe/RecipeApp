@@ -18,8 +18,8 @@ class _ShoppingListState extends State<ShoppingListPage> {
     @override
     Widget build(BuildContext context) {
         return Scaffold(
-            body: Container(
-                color: Colors.grey,
+            body: Center(
+                child: Text("Thank you for letting us know you are intersted in the shopping card feature."),
             ),
         );
     }
