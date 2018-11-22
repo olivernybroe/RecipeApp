@@ -18,8 +18,8 @@ class _ExploreState extends State<ExplorePage> {
     @override
     Widget build(BuildContext context) {
         return Scaffold(
-            body: Container(
-                color: Colors.yellow,
+            body: Center(
+                child: Text("Thank you for letting us know you are intersted in this feature."),
             ),
         );
     }
