@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:MealEngineer/main.dart';
 
 
 
@@ -15,6 +17,7 @@ class RecipesPage extends StatefulWidget {
 
 
 class _RecipeState extends State<RecipesPage> {
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -30,13 +33,20 @@ class _RecipeState extends State<RecipesPage> {
 
 
     Widget _buildBody(BuildContext context) {
-        return StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection('users').document('WnUSOQjMQbfxS0dsCobG').collection('recipes').snapshots(),
-            builder: (context, snapshot) {
-                if (!snapshot.hasData) return LinearProgressIndicator();
+        return StreamBuilder(
+            stream: auth.currentUser().asStream(),
+            builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
+                if(!snapshot.hasData) return LinearProgressIndicator();
 
-                return _buildList(context, snapshot.data.documents);
-            },
+                return StreamBuilder<QuerySnapshot>(
+                    stream: Firestore.instance.collection('users').document(snapshot.data.uid).collection('recipes').snapshots(),
+                    builder: (context, snapshot) {
+                        if (!snapshot.hasData) return LinearProgressIndicator();
+
+                        return _buildList(context, snapshot.data.documents);
+                    },
+                );
+            }
         );
     }
 

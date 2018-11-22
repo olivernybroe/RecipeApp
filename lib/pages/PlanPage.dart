@@ -84,7 +84,6 @@ class _PlanState extends State<PlanPage> with AutomaticKeepAliveClientMixin<Plan
         return TabBar(
             isScrollable: true,
             tabs: List.generate(Plan.now().days.length,(index) {
-                print(index);
                 return Tab(
                     child: Column(
                         children: <Widget>[

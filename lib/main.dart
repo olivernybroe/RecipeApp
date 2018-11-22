@@ -4,8 +4,14 @@ import 'package:MealEngineer/pages/PlanPage.dart';
 import 'package:MealEngineer/pages/ShoppingListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/pages/RecipesPage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:MealEngineer/pages/SplashPage.dart';
+
+final GoogleSignIn googleSignIn = GoogleSignIn();
+final FirebaseAuth auth = FirebaseAuth.instance;
 
 void main() {
   runApp(MyApp());
@@ -16,7 +22,24 @@ class MyApp extends StatelessWidget {
     Widget build(BuildContext context) {
         return MaterialApp(
             title: '',
-            home: Home()
+            home: _handleCurrentScreen()
+        );
+    }
+
+    Widget _handleCurrentScreen() {
+        return StreamBuilder<FirebaseUser>(
+            stream: auth.onAuthStateChanged,
+            builder: (BuildContext context, snapshot) {
+                print(snapshot);
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SplashPage();
+                } else {
+                    if (snapshot.hasData) {
+                        return Home();
+                    }
+                    return LoginPage();
+                }
+            }
         );
     }
 }
@@ -60,7 +83,7 @@ class _HomeState extends State<Home> {
                   ),
                   Container(
                       child: SafeArea(
-                          child: LoginPage()
+                          child: ExplorePage()
                       ),
                   ),
               ],
