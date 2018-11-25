@@ -11,9 +11,26 @@ class RecipeCard extends Card {
     mainAxisSize: MainAxisSize.min,
     children: <Widget>[
       ListTile(
-        leading: Icon(Icons.album),
+        leading: recipe.image,
         title: Text(recipe.name),
-        subtitle: Text('A really nice subtitle'),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Icon(Icons.person),
+                Text(' ' + (recipe.servings ?? '?').toString() + " servings")
+              ],
+            ),
+            Text('   '),
+            Row(
+              children: <Widget>[
+                Icon(Icons.access_time),
+                Text(' ' + (((recipe.prepTime ?? 0)+(recipe.cookTime ?? 0))/60).floor().toString() + ' m')
+              ],
+            ),
+          ],
+        ),
       ),
     ],
   );

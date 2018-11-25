@@ -60,8 +60,6 @@ enum MealType {
     Breakfast,
     Lunch,
     Dinner
-
-
 }
 
 class Meal {

@@ -47,71 +47,65 @@ class MyApp extends StatelessWidget {
 class Home extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-      return _HomeState();
+      return HomeState();
   }
 }
 
-class _HomeState extends State<Home> {
+abstract class Page {
+    Widget pageView(BuildContext context);
+
+    BottomNavigationBarItem navigationBarItem(BuildContext context);
+
+    AppBar appBar(BuildContext context) {
+        return new AppBar();
+    }
+
+    Widget floatingActionButton(BuildContext context) {
+        return null;
+    }
+}
+
+class HomeState extends State<Home> with TickerProviderStateMixin {
     PageController _pageController;
 
-    /// Indicating the current displayed page
-    /// 0: Recipes
-    /// 1: Plan
-    /// 2: Shopping list
     int _page = 0;
+
+    List pages;
+
+    HomeState() {
+        pages = [
+            RecipesPage(this),
+            PlanPage(this),
+            ShoppingListPage(),
+            ExplorePage(),
+        ];
+    }
 
 
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-          body: PageView(
-              children: [
-                  Container(
-                      child: SafeArea(
-                          child: RecipesPage()
-                      ),
-                  ),
-                  Container(
-                      child: SafeArea(
-                          child: PlanPage()
-                      ),
-                  ),
-                  Container(
-                      child: SafeArea(
-                          child: ShoppingListPage()
-                      ),
-                  ),
-                  Container(
-                      child: SafeArea(
-                          child: ExplorePage()
-                      ),
-                  ),
-              ],
+      var currentPage = pages[_page];
 
-              /// Specify the page controller
+      return Scaffold(
+          appBar: currentPage.appBar(context),
+          floatingActionButton: currentPage.floatingActionButton(context),
+          body: PageView(
+              children: pages.map((page) {
+                  return Container(
+                      child: SafeArea(
+                          child: page.pageView(context)
+                      ),
+                  );
+              }).toList(),
+
               controller: _pageController,
               onPageChanged: onPageChanged
           ),
           bottomNavigationBar: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              items: [
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.book),
-                      title: Text('Recipes')
-                  ),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.event),
-                      title: Text('Plan')
-                  ),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.shopping_cart),
-                      title: Text('Shopping List')
-                  ),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.public),
-                      title: Text("Explore"),
-                  ),
-              ],
+              items: pages.map((page) {
+                  return page.navigationBarItem(context) as BottomNavigationBarItem;
+              }).toList(),
               onTap: navigationTapped,
               currentIndex: _page,
           ),
