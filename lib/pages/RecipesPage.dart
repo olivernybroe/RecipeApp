@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
+import 'package:MealEngineer/pages/AddRecipe.dart';
 
 
 
@@ -13,7 +14,6 @@ class RecipesPage extends StatefulWidget {
 
 }
 
-
 class _RecipeState extends State<RecipesPage> {
     @override
     Widget build(BuildContext context) {
@@ -21,7 +21,12 @@ class _RecipeState extends State<RecipesPage> {
             body: _buildBody(context),
 
             floatingActionButton: new FloatingActionButton(
-                onPressed: null,
+                onPressed: () {
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddRecipe()),
+                        );
+                    },
                 tooltip: 'Create a recipe',
                 child: new Icon(Icons.add),
             ),
