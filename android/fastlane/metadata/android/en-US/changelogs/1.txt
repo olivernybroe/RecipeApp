@@ -1,0 +1,1 @@
+This is the first release of the app. It is in a really rough state right now, we are working on it!

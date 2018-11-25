@@ -59,7 +59,9 @@ class Day {
 enum MealType {
     Breakfast,
     Lunch,
-    Dinner
+    Dinner,
+    Desert,
+    Snack
 }
 
 class Meal {

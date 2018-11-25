@@ -12,21 +12,21 @@ class MealSearch {
         values.addAll(MealType.values.map((MealType mealType) {
             return mealType.toString().substring(mealType.toString().indexOf('.')+1);
         }));
-
         return values;
     }
 }
 
 class RecipesPage extends Page {
-
     TabController tabController;
+    FirebaseUser currentUser;
 
-    RecipesPage(TickerProvider tickerProvider) {
-        tabController = new TabController(length: MealSearch.values.length, vsync: tickerProvider);
+    RecipesPage(homeState) {
+        tabController = new TabController(length: MealSearch.values.length, vsync: homeState);
+        currentUser = homeState.currentUser;
     }
 
     Widget pageView(BuildContext context) {
-        return _RecipesPage(tabController);
+        return _RecipesPage(currentUser, tabController);
     }
 
     @override
@@ -70,25 +70,27 @@ class RecipesPage extends Page {
 
 class _RecipesPage extends StatefulWidget {
     final TabController tabController;
+    final FirebaseUser firebaseUser;
 
-    _RecipesPage(this.tabController);
+    _RecipesPage(this.firebaseUser, this.tabController);
 
     @override
     State<StatefulWidget> createState() {
-        return _RecipeState(tabController);
+        return _RecipeState(firebaseUser, tabController);
     }
 }
 
 class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixin<_RecipesPage> {
     final TabController tabController;
+    final FirebaseUser currentUser;
 
-    _RecipeState(this.tabController);
+    _RecipeState(this.currentUser, this.tabController);
 
 
     @override
     bool get wantKeepAlive => true;
 
-    Stream<FirebaseUser> userStream;
+    final Stream<FirebaseUser> userStream = auth.currentUser().asStream();
 
     @override
     Widget build(BuildContext context) {
@@ -96,26 +98,19 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
             controller: tabController,
             children: MealSearch.values.map((String mealType) {
                 //return Text(mealType.toString());
-                return _buildBody(context);
+                return _buildBody(context, mealType);
             }).toList()
         );
     }
 
-    Widget _buildBody(BuildContext context) {
-        return StreamBuilder(
-            stream: userStream,
-            builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
-                if(!snapshot.hasData) return LinearProgressIndicator();
+    Widget _buildBody(BuildContext context, String mealType) {
+        return StreamBuilder<QuerySnapshot>(
+            stream: recipeStream(mealType),
+            builder: (context, snapshot) {
+                if (!snapshot.hasData) return LinearProgressIndicator();
 
-                return StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance.collection('users').document(snapshot.data.uid).collection('recipes').snapshots(),
-                    builder: (context, snapshot) {
-                        if (!snapshot.hasData) return LinearProgressIndicator();
-
-                        return _buildList(context, snapshot.data.documents);
-                    },
-                );
-            }
+                return _buildList(context, snapshot.data.documents);
+            },
         );
     }
 
@@ -130,10 +125,21 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
         return RecipeCard(recipe);
     }
 
+    Stream<QuerySnapshot> recipeStream(String mealType) {
+        var query = Firestore.instance.collection('users')
+            .document(currentUser.uid).collection('recipes');
+
+        if(mealType != 'All') {
+            return query.where('mealType', arrayContains: mealType).snapshots();
+        }
+
+        return query.snapshots();
+    }
+
+
     @override
     void initState() {
         super.initState();
-        userStream = auth.currentUser().asStream();
     }
 
 

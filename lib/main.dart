@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
                     return SplashPage();
                 } else {
                     if (snapshot.hasData) {
-                        return Home();
+                        return Home(snapshot.data);
                     }
                     return LoginPage();
                 }
@@ -45,9 +45,13 @@ class MyApp extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
-  @override
+    FirebaseUser currentUser;
+
+    Home(this.currentUser);
+
+    @override
   State<StatefulWidget> createState() {
-      return HomeState();
+      return HomeState(currentUser);
   }
 }
 
@@ -67,12 +71,13 @@ abstract class Page {
 
 class HomeState extends State<Home> with TickerProviderStateMixin {
     PageController _pageController;
+    FirebaseUser currentUser;
 
     int _page = 0;
 
     List pages;
 
-    HomeState() {
+    HomeState(this.currentUser) {
         pages = [
             RecipesPage(this),
             PlanPage(this),
@@ -147,5 +152,3 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
         _pageController.dispose();
     }
 }
-
-
