@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/Models/Plan.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
+import 'dart:math';
 
 class AddRecipe extends StatefulWidget {
   @override
@@ -9,23 +10,26 @@ class AddRecipe extends StatefulWidget {
 
 class _AddRecipeState extends State<AddRecipe> {
   @override
-  final formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
+  final _lastIngredientController = TextEditingController();
 
   String selected, recipe, description, cooking;  // TODO: Should be recipe.variables
-  List<String> ingredients;                       // TODO: Should be recipe.ingredients
+  List<String> ingredients;                       // TODO: Should be recipe.ingredients[]
 
-  List<TextFormField> ingredientFields = [];
-  List<DropdownMenuItem<String>> categories = [];
+  List<TextFormField> _ingredientFields = [];
+  List<DropdownMenuItem<String>> _categories = [];
 
   void loadCategories() {
-    categories = [];
+    _categories = [];
     for (MealType category in MealType.values) {
       String cat =
           category.toString().substring(category.toString().indexOf('.') + 1);
-      categories.add(new DropdownMenuItem(
-        child: new Text(cat),
+      _categories.add(new DropdownMenuItem(
         value: cat,
-      ));
+        child:
+          new Text(cat),
+        )
+      );
     }
   }
 
@@ -35,31 +39,54 @@ class _AddRecipeState extends State<AddRecipe> {
 
     Widget addRecipeSection = Container(
       child: Form(
-          key: formKey,
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-
-              DropdownButton(
-                value: selected,
-                items: categories,
-                isExpanded: true,
-                hint: new Text('Select a category'),
-                onChanged: (value) {
-                  setState(() {
-                    selected = value;
-                  });
-                },
+              InputDecorator(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.category,
+                  ),
+                ),
+                child:
+                DropdownButton(
+                  value: selected,
+                  items: _categories,
+                  //isExpanded: true,
+                  hint:
+                  Row(
+                    children: <Widget>[
+                      new Text('Select a category'),
+                    ],
+                  ),
+                  //new Text('Select a category'),
+                  onChanged: (value) {
+                    setState(() {
+                      selected = value;
+                    });
+                  },
+                ),
               ),
 
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name of recipe'),
+                decoration: InputDecoration(
+                    labelText: 'Name of recipe',
+                    prefixIcon: Icon(
+                    Icons.receipt,
+                  ),
+                ),
                 validator: (input) => input.length == 0 ? 'Your recipe must have a name' : null,
                 onSaved: (input) => recipe = input,
               ),
 
               TextFormField(
-                decoration: InputDecoration(labelText: 'Short description'),
+                decoration: InputDecoration(
+                    labelText: 'Short description',
+                    prefixIcon: Icon(
+                    Icons.subtitles,
+                  ),
+                ),
                 validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
                 onSaved: (input) => description = input,
               ),
@@ -72,24 +99,33 @@ class _AddRecipeState extends State<AddRecipe> {
               ),
 
               TextFormField(
+                controller: _lastIngredientController,
                 decoration: InputDecoration(
-                  labelText: 'Ingredients',
+                  labelText: 'Ingredient',
+                  prefixIcon: Icon(
+                    Icons.fastfood,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.add),
                     onPressed: () {
                       setState(() {
-                        _addIngredient();
+                        _addIngredient(_lastIngredientController.text);
+                        _lastIngredientController.text = '';
                       });
                     }),
                 ),
-                onSaved: (input) => input.length > 0 ? ingredients.add(input) : null,
+                validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
+                onSaved: (input) => ingredients.add(input),
               ),
 
               TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
                 decoration: InputDecoration(
-                    labelText: 'Recipe instructions'),
+                    labelText: 'Recipe instructions',
+                    prefixIcon: Icon(
+                    Icons.description,
+                  ),),
                 validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
                 onSaved: (input) => description = input,
               ),
@@ -108,7 +144,7 @@ class _AddRecipeState extends State<AddRecipe> {
               ),
             ],
             ),
-          )
+          ),
     );
 
     return Scaffold(
@@ -125,18 +161,22 @@ class _AddRecipeState extends State<AddRecipe> {
   }
 
   void _submit() {
-    if (formKey.currentState.validate()) {
-      formKey.currentState.save();
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
 
-      // TODO: Add everything to object instead of local variables, and push to firebase.
+      // TODO: Add everything to object instead of local variables, and push to firebase from here.
     }
   }
 
-  void _addIngredient() {
-    ingredientFields.add(
+  void _addIngredient(value) {
+    Random rnd = new Random();
+    Key key = new Key(rnd.nextInt(10000).toString());
+    _ingredientFields.add(
         TextFormField(
+          initialValue: value,
+          key: key,
           decoration: InputDecoration(
-            labelText: 'Ingredients',
+            labelText: 'Ingredient',
             prefixIcon: Icon(
               Icons.fastfood,
             ),
@@ -144,9 +184,8 @@ class _AddRecipeState extends State<AddRecipe> {
                 icon: Icon(Icons.remove),
                 onPressed: () {
                   setState(() {
-                    removeIngredient(22);
+                    removeIngredient(key);
                   });
-                  debugPrint('222');
                 }),
           ),
           validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
@@ -156,11 +195,12 @@ class _AddRecipeState extends State<AddRecipe> {
   }
 
   void removeIngredient(key) {
-    debugPrint(key.toString());
-    // TODO: Figure out a way to remove a specific TextFormField object from a List.
+    setState(() {
+      _ingredientFields.removeWhere((ingredientFields) => ingredientFields.key == key);
+    });
   }
 
   List<Widget> listIngredientFields() {
-    return ingredientFields;
+    return _ingredientFields;
   }
 }
