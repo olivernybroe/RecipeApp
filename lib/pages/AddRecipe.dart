@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/Models/Plan.dart';
-import 'package:MealEngineer/Models/Recipe.dart';
+import 'package:MealEngineer/Models/RecipeV2.dart';
 import 'dart:math';
 
 class AddRecipe extends StatefulWidget {
@@ -13,9 +13,11 @@ class _AddRecipeState extends State<AddRecipe> {
   final _formKey = GlobalKey<FormState>();
   final _lastIngredientController = TextEditingController();
 
-  String selected, recipe, description, cooking;  // TODO: Should be recipe.variables
-  List<String> ingredients;                       // TODO: Should be recipe.ingredients[]
+  RecipeV2 _recipeModel = new RecipeV2();
 
+  String _selected;
+
+  List<String> ingredients = [];
   List<TextFormField> _ingredientFields = [];
   List<DropdownMenuItem<String>> _categories = [];
 
@@ -51,7 +53,7 @@ class _AddRecipeState extends State<AddRecipe> {
                 ),
                 child:
                 DropdownButton(
-                  value: selected,
+                  value: _selected,
                   items: _categories,
                   //isExpanded: true,
                   hint:
@@ -63,7 +65,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   //new Text('Select a category'),
                   onChanged: (value) {
                     setState(() {
-                      selected = value;
+                      _selected = value;
                     });
                   },
                 ),
@@ -77,7 +79,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   ),
                 ),
                 validator: (input) => input.length == 0 ? 'Your recipe must have a name' : null,
-                onSaved: (input) => recipe = input,
+                onSaved: (input) => _recipeModel.recipe = input,
               ),
 
               TextFormField(
@@ -88,7 +90,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   ),
                 ),
                 validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
-                onSaved: (input) => description = input,
+                onSaved: (input) => _recipeModel.description = input,
               ),
 
               // Retrieve list of ingredients
@@ -115,7 +117,7 @@ class _AddRecipeState extends State<AddRecipe> {
                     }),
                 ),
                 validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
-                onSaved: (input) => ingredients.add(input),
+                onSaved: (input) => _recipeModel.ingredients.add(input),
               ),
 
               TextFormField(
@@ -127,7 +129,7 @@ class _AddRecipeState extends State<AddRecipe> {
                     Icons.description,
                   ),),
                 validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
-                onSaved: (input) => description = input,
+                onSaved: (input) => _recipeModel.cooking = input,
               ),
 
               Row(
@@ -164,7 +166,12 @@ class _AddRecipeState extends State<AddRecipe> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      // TODO: Add everything to object instead of local variables, and push to firebase from here.
+      // Couldn't add validator to dropdown menu..
+      if(_selected != null) {
+        _recipeModel.category = _selected;
+      }
+
+      _recipeModel.save();
     }
   }
 
@@ -189,7 +196,7 @@ class _AddRecipeState extends State<AddRecipe> {
                 }),
           ),
           validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
-          onSaved: (input) => ingredients.add(input),
+          onSaved: (input) => _recipeModel.ingredients.add(input),
         )
     );
   }
