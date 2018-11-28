@@ -121,7 +121,7 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
             Scaffold.of(context).showSnackBar(
                  SnackBar(
                      content: Text("It is currently not possible to add recipes to the plan. This is an example of how it will look."),
-                     duration: Duration(days: 1),
+                     duration: Duration(seconds: 10),
                  ),
             );
         });
