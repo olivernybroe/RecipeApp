@@ -1,0 +1,2 @@
+Added launch icon
+Fixed app title being wrong on some devices
