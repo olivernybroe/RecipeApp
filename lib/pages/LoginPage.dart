@@ -32,14 +32,6 @@ class _LoginState extends State<LoginPage> {
                 child: Text('Continue without login'),
                 onPressed: () => _handleAnonymousSignIn(),
             ),
-            RaisedButton(
-                child: Text('Logout'),
-              onPressed: () {
-                _handleSignOut()
-                    .then((user) => print("sign out"))
-                    .catchError((e) => print(e));
-              },
-            )
           ],
         ),
       ),

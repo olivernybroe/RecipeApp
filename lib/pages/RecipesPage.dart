@@ -63,9 +63,11 @@ class RecipesPage extends Page {
             onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AddRecipe()),
+                    MaterialPageRoute(
+                        builder: (context) => AddRecipe(currentUser)
+                    ),
                 );
-            },,
+            },
             tooltip: 'Create a recipe',
             child: new Icon(Icons.add),
         );
@@ -103,7 +105,6 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
         return TabBarView(
             controller: tabController,
             children: MealSearch.values.map((String mealType) {
-                //return Text(mealType.toString());
                 return _buildBody(context, mealType);
             }).toList()
         );
@@ -113,7 +114,16 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
         return StreamBuilder<QuerySnapshot>(
             stream: recipeStream(mealType),
             builder: (context, snapshot) {
-                if (!snapshot.hasData) return LinearProgressIndicator();
+                if (!snapshot.hasData) {
+                    return Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                            height: 80.0,
+                            width: 80.0,
+                            child: CircularProgressIndicator(strokeWidth: 6.0,),
+                        )
+                    );
+                }
 
                 return _buildList(context, snapshot.data.documents);
             },
@@ -128,7 +138,26 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
 
     Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
         final recipe = Recipe.fromSnapshot(data);
-        return RecipeCard(recipe);
+        return Dismissible(
+            direction: DismissDirection.endToStart,
+            key: Key(recipe.id),
+            background: Container(
+                color: Colors.redAccent,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                        Text("DELETE", style: TextStyle(color: Colors.white),),
+                        Padding(padding: EdgeInsets.all(8.0),),
+                        Icon(Icons.delete, color: Colors.white,),
+                        Padding(padding: EdgeInsets.all(8.0),),
+                    ],
+                ),
+            ),
+            child: RecipeCard(recipe),
+            onDismissed: (DismissDirection direction) {
+                recipe.reference.delete();
+            },
+        );
     }
 
     Stream<QuerySnapshot> recipeStream(String mealType) {

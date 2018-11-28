@@ -41,7 +41,7 @@ class Plan {
             now,
             List.generate(Random().nextInt(10), (index) {
                 return Meal(
-                    Recipe.fromMap({'name' : 'test'}),
+                    Recipe.fromMap({'name' : 'test'}, "works"),
                     MealType.values[index % 3]
                 );
             })

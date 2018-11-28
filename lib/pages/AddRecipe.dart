@@ -1,19 +1,29 @@
+import 'package:MealEngineer/Models/Recipe.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/Models/Plan.dart';
-import 'package:MealEngineer/Models/RecipeV2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
 class AddRecipe extends StatefulWidget {
+  final FirebaseUser currentUser;
+
+  AddRecipe(this.currentUser);
+
   @override
-  _AddRecipeState createState() => _AddRecipeState();
+  _AddRecipeState createState() => _AddRecipeState(this.currentUser);
 }
 
 class _AddRecipeState extends State<AddRecipe> {
-  @override
+
+  final FirebaseUser currentUser;
+
+  _AddRecipeState(this.currentUser);
+
   final _formKey = GlobalKey<FormState>();
   final _lastIngredientController = TextEditingController();
 
-  RecipeV2 _recipeModel = new RecipeV2();
+  Recipe _recipeModel = Recipe();
 
   String _selected;
 
@@ -62,7 +72,6 @@ class _AddRecipeState extends State<AddRecipe> {
                       new Text('Select a category'),
                     ],
                   ),
-                  //new Text('Select a category'),
                   onChanged: (value) {
                     setState(() {
                       _selected = value;
@@ -79,7 +88,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   ),
                 ),
                 validator: (input) => input.length == 0 ? 'Your recipe must have a name' : null,
-                onSaved: (input) => _recipeModel.recipe = input,
+                onSaved: (input) => _recipeModel.name = input,
               ),
 
               TextFormField(
@@ -89,9 +98,46 @@ class _AddRecipeState extends State<AddRecipe> {
                     Icons.subtitles,
                   ),
                 ),
-                validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
+                //validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
                 onSaved: (input) => _recipeModel.description = input,
               ),
+
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: '# of serverings',
+                  prefixIcon: Icon(Icons.person)
+                ),
+                keyboardType: TextInputType.numberWithOptions(
+                  signed: false,
+                  decimal: false
+                ),
+                onSaved: (input) => _recipeModel.servings = int.parse(input),
+              ),
+
+              TextFormField(
+                decoration: InputDecoration(
+                    labelText: 'Prep time in minutes',
+                    prefixIcon: Icon(Icons.access_time)
+                ),
+                keyboardType: TextInputType.numberWithOptions(
+                    signed: false,
+                    decimal: false
+                ),
+                onSaved: (input) => _recipeModel.prepTime = int.parse(input)*60,
+              ),
+
+              TextFormField(
+                decoration: InputDecoration(
+                    labelText: 'Cook time in minutes',
+                    prefixIcon: Icon(Icons.access_time)
+                ),
+                keyboardType: TextInputType.numberWithOptions(
+                    signed: false,
+                    decimal: false
+                ),
+                onSaved: (input) => _recipeModel.cookTime = int.parse(input)*60,
+              ),
+
 
               // Retrieve list of ingredients
               Container(
@@ -116,7 +162,7 @@ class _AddRecipeState extends State<AddRecipe> {
                       });
                     }),
                 ),
-                validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
+                //validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
                 onSaved: (input) => _recipeModel.ingredients.add(input),
               ),
 
@@ -128,21 +174,8 @@ class _AddRecipeState extends State<AddRecipe> {
                     prefixIcon: Icon(
                     Icons.description,
                   ),),
-                validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
-                onSaved: (input) => _recipeModel.cooking = input,
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: _submit,
-                        child: Text('Create Recipe'),
-                      ),
-                  )
-                ],
+                //validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
+                onSaved: (input) => _recipeModel.instructions = input,
               ),
             ],
             ),
@@ -152,6 +185,15 @@ class _AddRecipeState extends State<AddRecipe> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add your own recipe'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.check,
+              color: Theme.of(context).primaryTextTheme.body1.color,
+            ),
+            onPressed: () {_submit(context);},
+          )
+        ],
       ),
       body: ListView(
         padding: EdgeInsets.all(8.0),
@@ -162,16 +204,22 @@ class _AddRecipeState extends State<AddRecipe> {
     );
   }
 
-  void _submit() {
+  void _submit(BuildContext context) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
       // Couldn't add validator to dropdown menu..
       if(_selected != null) {
-        _recipeModel.category = _selected;
+        _recipeModel.mealTypes.add(
+            MealType.values.firstWhere((mealType) => mealType.toString().substring(mealType.toString().indexOf('.')+1) == _selected)
+        );
       }
+      _recipeModel.save(
+          Firestore.instance.collection('users')
+              .document(currentUser.uid).collection('recipes')
+      );
 
-      _recipeModel.save();
+      Navigator.pop(context);
     }
   }
 
