@@ -35,7 +35,6 @@ class PlanPage extends Page {
 
   @override
   AppBar appBar(BuildContext context) {
-
       return AppBar(
           bottom: TabBar(
               controller: tabController,
@@ -86,6 +85,11 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                     itemCount: MealType.values.length,
                     itemBuilder: (BuildContext context, int index){
                         var mealType = MealType.values[index];
+                        var meals = day.meals.where((meal) => meal.mealType == mealType);
+                        if(meals.isEmpty) {
+                            return null;
+                        }
+
                         return Column(
                             children: <Widget>[
                                 Text(
@@ -97,7 +101,7 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                                     ),
                                 ),
                                 Column(
-                                    children: day.meals.where((meal) => meal.mealType == mealType).map((meal) {
+                                    children: meals.map((meal) {
                                         return RecipeCard(meal.recipe);
                                     }).toList(),
                                 )
@@ -110,26 +114,17 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
         );
     }
 
-    Widget _buildTabBar() {
-        return TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabs: List.generate(Plan.now().days.length,(index) {
-                return Tab(
-                    child: Column(
-                        children: <Widget>[
-                            Text(DateFormat.E().format(Plan.now().days[index].day)),
-                            Text(DateFormat('d/M').format(Plan.now().days[index].day)),
-                        ],
-                    ),
-                );
-            }, growable: true),
-        );
-    }
-
     @override
     void initState() {
         super.initState();
+        new Future<Null>.delayed(Duration.zero, () {
+            Scaffold.of(context).showSnackBar(
+                 SnackBar(
+                     content: Text("It is currently not possible to add recipes to the plan. This is an example of how it will look."),
+                     duration: Duration(days: 1),
+                 ),
+            );
+        });
     }
 
 }
