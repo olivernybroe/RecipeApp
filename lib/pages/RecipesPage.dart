@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MealEngineer/Models/Recipe.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MealEngineer/main.dart';
+import 'package:MealEngineer/pages/AddRecipe.dart';
 
 class MealSearch {
     static List<String> get values {
@@ -59,7 +60,12 @@ class RecipesPage extends Page {
     @override
     Widget floatingActionButton(BuildContext context) {
         return new FloatingActionButton(
-            onPressed: null,
+            onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddRecipe()),
+                );
+            },,
             tooltip: 'Create a recipe',
             child: new Icon(Icons.add),
         );
