@@ -1,0 +1,2 @@
+- Fixed a bug with login not working all the time.
+- Fixed a bug with more fields was required when creating recipes then needed.

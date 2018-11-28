@@ -111,7 +111,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   signed: false,
                   decimal: false
                 ),
-                onSaved: (input) => _recipeModel.servings = int.parse(input),
+                onSaved: (input) => _recipeModel.servings = int.tryParse(input),
               ),
 
               TextFormField(
@@ -123,7 +123,7 @@ class _AddRecipeState extends State<AddRecipe> {
                     signed: false,
                     decimal: false
                 ),
-                onSaved: (input) => _recipeModel.prepTime = int.parse(input)*60,
+                onSaved: (input) => _recipeModel.prepTime = (int.tryParse(input) ?? 0)*60,
               ),
 
               TextFormField(
@@ -135,9 +135,8 @@ class _AddRecipeState extends State<AddRecipe> {
                     signed: false,
                     decimal: false
                 ),
-                onSaved: (input) => _recipeModel.cookTime = int.parse(input)*60,
+                onSaved: (input) => _recipeModel.cookTime = (int.tryParse(input) ?? 0)*60,
               ),
-
 
               // Retrieve list of ingredients
               Container(
@@ -243,7 +242,7 @@ class _AddRecipeState extends State<AddRecipe> {
                   });
                 }),
           ),
-          validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
+          //validator: (input) => input.length == 0 ? 'You must provide an ingredient to your recipe' : null,
           onSaved: (input) => _recipeModel.ingredients.add(input),
         )
     );

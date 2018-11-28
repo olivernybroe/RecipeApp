@@ -22,10 +22,11 @@ platform :android do
 
   desc "Submit a new Beta Build to Google Play"
   lane :beta do
-    gradle(task: "clean assembleRelease")
+    #gradle(task: "clean assembleRelease")
+    sh "cd ..; flutter build apk --release"
     upload_to_play_store(
         track: 'beta',
-        apk: '../build/app/outputs/apk/release/app-release.apk',
+        apk: 'build/app/outputs/apk/release/app-release.apk',
     )
   end
 

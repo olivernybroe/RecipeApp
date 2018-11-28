@@ -43,7 +43,9 @@ class Recipe {
             'mealType' : mealTypes.map((MealType mealType) {
                 return mealType.toString().substring(mealType.toString().indexOf('.')+1);
             }).toList(),
-            'servings' : servings
+            'servings' : servings,
+            'prep_time' : prepTime,
+            'cook_time' : cookTime,
         };
     }
 
