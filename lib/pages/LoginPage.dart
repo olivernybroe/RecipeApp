@@ -1,6 +1,7 @@
 import 'package:MealEngineer/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
@@ -16,24 +17,27 @@ class _LoginState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
           children: <Widget>[
-            SignInButton(
-              Buttons.Google,
-              onPressed: () {
-                _handleGoogleSignIn()
-                    .then((FirebaseUser user) => print(user))
-                    .catchError((e) => print(e));
-              },
-            ),
-            RaisedButton(
-                child: Text('Continue without login'),
-                onPressed: () => _handleAnonymousSignIn(),
-            ),
+              Image.asset('images/icon.png'),
+              RaisedButton.icon(
+                  color: Color(0xFFDD4B39),
+                  textColor: Colors.white,
+                  label: Text('Sign in with Google'),
+                  icon: Icon(FontAwesomeIcons.google),
+                  onPressed: () {
+                      _handleGoogleSignIn()
+                          .then((FirebaseUser user) => print(user))
+                          .catchError((e) => print(e));
+                  },
+              ),
+              /*
+              RaisedButton(
+                  child: Text('try app'.toUpperCase()),
+                  onPressed: () => _handleAnonymousSignIn(),
+              ),
+              */
           ],
-        ),
       ),
     );
   }
