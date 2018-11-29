@@ -31,12 +31,11 @@ class _LoginState extends State<LoginPage> {
                           .catchError((e) => print(e));
                   },
               ),
-              /*
               RaisedButton(
                   child: Text('try app'.toUpperCase()),
                   onPressed: () => _handleAnonymousSignIn(),
               ),
-              */
+
           ],
       ),
     );
