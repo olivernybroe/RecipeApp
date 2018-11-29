@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:MealEngineer/pages/ExplorePage.dart';
 import 'package:MealEngineer/pages/LoginPage.dart';
 import 'package:MealEngineer/pages/PlanPage.dart';
 import 'package:MealEngineer/pages/ShoppingListPage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:MealEngineer/pages/RecipesPage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,12 +12,44 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MealEngineer/pages/SplashPage.dart';
+import 'package:flutter_crashlytics/flutter_crashlytics.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final FirebaseAuth auth = FirebaseAuth.instance;
 
-void main() {
-  runApp(MyApp());
+void main() async {
+    bool isInDebugMode = false;
+    profile((){
+        isInDebugMode=true;
+    });
+
+    FlutterError.onError = (FlutterErrorDetails details) {
+        if (isInDebugMode) {
+            // In development mode simply print to console.
+            FlutterError.dumpErrorToConsole(details);
+        } else {
+            // In production mode report to the application zone to report to
+            // Crashlytics.
+            Zone.current.handleUncaughtError(details.exception, details.stack);
+        }
+    };
+
+    bool optIn = true;
+    if (optIn) {
+        await FlutterCrashlytics().initialize();
+    } else {
+        // In this case Crashlytics won't send any reports.
+        // Usually handling opt in/out is required by the Privacy Regulations
+    }
+
+    runZoned<Future<Null>>(() async {
+        runApp(MyApp());
+    }, onError: (error, stackTrace) async {
+        // Whenever an error occurs, call the `reportCrash` function. This will send
+        // Dart errors to our dev console or Crashlytics depending on the environment.
+        debugPrint(error.toString());
+        await FlutterCrashlytics().reportCrash(error, stackTrace, forceCrash: false);
+    });
 }
 
 class MyApp extends StatelessWidget {

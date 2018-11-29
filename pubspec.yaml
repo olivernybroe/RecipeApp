@@ -31,6 +31,7 @@ dependencies:
 
   intl: ^0.15.7
   flutter_launcher_icons: ^0.7.0
+  flutter_crashlytics: ^0.1.1
 
 flutter_icons:
   android: "launcher_icon"

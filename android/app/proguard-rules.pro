@@ -6,3 +6,6 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 -keep class com.google.firebase.** { *; }
+-keepattributes *Annotation*
+-keep class com.crashlytics.** { *; }
+-keepattributes SourceFile,LineNumberTable
