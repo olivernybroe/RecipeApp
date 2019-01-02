@@ -7,7 +7,7 @@ description: A recipe app.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 0.1.4+4
+version: 0.1.5+5
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -55,20 +55,20 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/
+    - assets/images/
 
   fonts:
     - family: FontAwesomeProRegular
       fonts:
-        - asset: fonts/fa-pro-regular-400.otf
+        - asset: assets/fonts/fa-pro-regular-400.otf
           weight: 400
     - family: FontAwesomeProSolid
       fonts:
-        - asset: fonts/fa-pro-solid-900.otf
+        - asset: assets/fonts/fa-pro-solid-900.otf
           weight: 900
     - family: FontAwesomeProLight
       fonts:
-        - asset: fonts/fa-pro-light-300.otf
+        - asset: assets/fonts/fa-pro-light-300.otf
           weight: 300
 
   # To add assets to your application, add an assets section, like this:
