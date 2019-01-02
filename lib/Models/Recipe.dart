@@ -25,6 +25,9 @@ class Recipe {
             imageUrl = map['image'],
             servings = map['servings'] ?? null,
             cookTime = map['cook_time'] ?? null,
+            description = map['description'] ?? null,
+            instructions = map['instructions'] != null ? (map['instructions'] as String).replaceAll(RegExp(r"\\n"), "\n") : null,
+            ingredients = map['ingredients'] != null ? (map['ingredients'] as List).cast<String>() : null,
             prepTime = map['prep_time'] ?? null;
 
     Recipe.fromSnapshot(DocumentSnapshot snapshot)
@@ -41,21 +44,18 @@ class Recipe {
         return {
             'name' : name,
             'mealType' : mealTypes.map((MealType mealType) {
-                return mealType.toString().substring(mealType.toString().indexOf('.')+1);
+                return mealType.toString();
             }).toList(),
             'servings' : servings,
             'prep_time' : prepTime,
             'cook_time' : cookTime,
+            'description' : description,
+            'instructions' : instructions,
         };
     }
 
 
-    Widget get image {
-        if(imageUrl == null) {
-            return Icon(Icons.album);
-        }
-        return CircleAvatar(
-            backgroundImage: NetworkImage(imageUrl),
-        );
+    ImageProvider get image {
+        return imageUrl == null ? null : NetworkImage(imageUrl);
     }
 }

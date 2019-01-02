@@ -1,6 +1,9 @@
 import 'package:MealEngineer/Models/Recipe.dart';
+import 'package:MealEngineer/services/FontAwesome/FontAwesome.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
+
+import 'package:flutter/widgets.dart';
 
 class Plan {
     List<Day> days;
@@ -56,12 +59,55 @@ class Day {
     Day(this.day, this.meals);
 }
 
-enum MealType {
-    Breakfast,
-    Lunch,
-    Dinner,
-    Desert,
-    Snack
+class MealType {
+    static final MealType breakfast = MealType(
+        'Breakfast',
+        FontAwesomeIcons.wheatSolid
+    );
+    static final MealType lunch = MealType(
+        'Lunch',
+        FontAwesomeIcons.drumstickBiteSolid
+    );
+    static final MealType dinner = MealType(
+        'Dinner',
+        FontAwesomeIcons.turkeySolid
+    );
+    static final MealType desert = MealType(
+        'Desert',
+        FontAwesomeIcons.birthdayCakeSolid
+    );
+    static final MealType snack = MealType(
+        'Snack',
+        FontAwesomeIcons.appleAltSolid
+    );
+
+    static final List<MealType> values = [
+        breakfast,
+        lunch,
+        dinner,
+        desert,
+        snack
+    ];
+
+    final String name;
+    final IconData icon;
+
+    MealType(this.name, this.icon);
+
+    @override
+    String toString() {
+        return name;
+    }
+
+    @override
+    bool operator ==(Object other) =>
+        identical(this, other) ||
+            other is MealType &&
+                runtimeType == other.runtimeType &&
+                name == other.name;
+
+    @override
+    int get hashCode => name.hashCode;
 }
 
 class Meal {

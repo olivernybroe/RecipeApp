@@ -1,4 +1,5 @@
 import 'package:MealEngineer/Models/Plan.dart';
+import 'package:MealEngineer/services/FontAwesome/FontAwesome.dart';
 import 'package:MealEngineer/widgets/RecipeCard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,11 +9,11 @@ import 'package:MealEngineer/main.dart';
 import 'package:MealEngineer/pages/AddRecipe.dart';
 
 class MealSearch {
-    static List<String> get values {
-        List<String> values = ['All'];
-        values.addAll(MealType.values.map((MealType mealType) {
-            return mealType.toString().substring(mealType.toString().indexOf('.')+1);
-        }));
+    static List<MealType> get values {
+        List<MealType> values = [
+            MealType('All', FontAwesomeIcons.utensilsSolid)
+        ];
+        values.addAll(MealType.values);
         return values;
     }
 }
@@ -40,16 +41,18 @@ class RecipesPage extends Page {
 
     @override
     AppBar appBar(BuildContext context) {
+
         return new AppBar(
-            bottom: TabBar(
+            //title: Text("Recipes"),
+            title: TabBar(
                 controller: tabController,
                 isScrollable: true,
-                tabs: MealSearch.values.map((String mealType) {
+                indicatorColor: Theme.of(context).primaryIconTheme.color,
+                tabs: MealSearch.values.map((MealType mealType) {
                     return Tab(
-                        child: Column(
-                            children: <Widget>[
-                                Text(mealType)
-                            ],
+                        icon: Icon(
+                            mealType.icon,
+                            color: Theme.of(context).primaryIconTheme.color,
                         ),
                     );
                 }).toList()
@@ -104,13 +107,13 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
     Widget build(BuildContext context) {
         return TabBarView(
             controller: tabController,
-            children: MealSearch.values.map((String mealType) {
+            children: MealSearch.values.map((MealType mealType) {
                 return _buildBody(context, mealType);
             }).toList()
         );
     }
 
-    Widget _buildBody(BuildContext context, String mealType) {
+    Widget _buildBody(BuildContext context, MealType mealType) {
         return StreamBuilder<QuerySnapshot>(
             stream: recipeStream(mealType),
             builder: (context, snapshot) {
@@ -153,19 +156,19 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
                     ],
                 ),
             ),
-            child: RecipeCard(recipe),
+            child: RecipeCard(context, recipe),
             onDismissed: (DismissDirection direction) {
                 recipe.reference.delete();
             },
         );
     }
 
-    Stream<QuerySnapshot> recipeStream(String mealType) {
+    Stream<QuerySnapshot> recipeStream(MealType mealType) {
         var query = Firestore.instance.collection('users')
             .document(currentUser.uid).collection('recipes');
 
-        if(mealType != 'All') {
-            return query.where('mealType', arrayContains: mealType).snapshots();
+        if(mealType.name != 'All') {
+            return query.where('mealType', arrayContains: mealType.name).snapshots();
         }
 
         return query.snapshots();

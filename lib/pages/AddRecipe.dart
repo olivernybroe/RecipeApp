@@ -34,8 +34,7 @@ class _AddRecipeState extends State<AddRecipe> {
   void loadCategories() {
     _categories = [];
     for (MealType category in MealType.values) {
-      String cat =
-          category.toString().substring(category.toString().indexOf('.') + 1);
+      String cat = category.name;
       _categories.add(new DropdownMenuItem(
         value: cat,
         child:
@@ -183,12 +182,13 @@ class _AddRecipeState extends State<AddRecipe> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add your own recipe'),
+        title: Text(
+            'Add your own recipe',
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
               Icons.check,
-              color: Theme.of(context).primaryTextTheme.body1.color,
             ),
             onPressed: () {_submit(context);},
           )
@@ -210,7 +210,7 @@ class _AddRecipeState extends State<AddRecipe> {
       // Couldn't add validator to dropdown menu..
       if(_selected != null) {
         _recipeModel.mealTypes.add(
-            MealType.values.firstWhere((mealType) => mealType.toString().substring(mealType.toString().indexOf('.')+1) == _selected)
+            MealType.values.firstWhere((mealType) => mealType.name == _selected)
         );
       }
       _recipeModel.save(

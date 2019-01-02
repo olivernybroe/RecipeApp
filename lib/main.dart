@@ -57,7 +57,45 @@ class MyApp extends StatelessWidget {
     Widget build(BuildContext context) {
         return MaterialApp(
             title: '',
-            home: _handleCurrentScreen()
+            home: _handleCurrentScreen(),
+            theme: ThemeData(
+                // Define the default Brightness and Colors
+                brightness: Brightness.light,
+                primaryColor: Color.fromRGBO(130,187,60, 1.0),
+                //accentColor: Color.fromRGBO(110, 96, 87, 1.0),
+
+                // Define the default Font Family
+                fontFamily: 'Montserrat',
+
+                iconTheme: IconThemeData(
+                    //color: Colors.blue
+                ),
+                primaryIconTheme: IconThemeData(
+                    color: Colors.white70//Color.fromRGBO(81, 139, 0, 1.0),
+                ),
+
+                accentIconTheme: IconThemeData(
+                    //color: Colors.white
+                ),
+
+                buttonTheme: ButtonThemeData(
+                    textTheme: ButtonTextTheme.primary
+                ),
+
+
+                // Define the default TextTheme. Use this to specify the default
+                // text styling for headlines, titles, bodies of text, and more.
+                textTheme: TextTheme(
+                    headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+                    title: TextStyle(),
+                    body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+                ),
+                primaryTextTheme: TextTheme(
+                    headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+                    title: TextStyle(color: Colors.white70),
+                    body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+                ),
+            ),
         );
     }
 

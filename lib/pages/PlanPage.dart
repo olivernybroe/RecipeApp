@@ -93,7 +93,7 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                         return Column(
                             children: <Widget>[
                                 Text(
-                                    mealType.toString().substring(mealType.toString().indexOf('.')+1),
+                                    mealType.name,
                                     style: TextStyle(
                                         //decoration: TextDecoration.underline,
                                         fontSize: 30.0,
@@ -102,7 +102,7 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                                 ),
                                 Column(
                                     children: meals.map((meal) {
-                                        return RecipeCard(meal.recipe);
+                                        return RecipeCard(context, meal.recipe);
                                     }).toList(),
                                 )
 

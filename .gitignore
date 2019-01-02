@@ -11,3 +11,6 @@ build/
 *.iml
 
 api*.json
+/fonts/fa-pro-solid-900.otf
+/fonts/fa-pro-regular-400.otf
+/fonts/fa-pro-light-300.otf
