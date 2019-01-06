@@ -79,8 +79,10 @@ class MyApp extends StatelessWidget {
                 ),
 
                 accentIconTheme: IconThemeData(
-                    //color: Colors.white
+                    color: Colors.white70,
                 ),
+
+                accentColor: Color.fromRGBO(130,187,60, 1.0),
 
                 buttonTheme: ButtonThemeData(
                     textTheme: ButtonTextTheme.primary
