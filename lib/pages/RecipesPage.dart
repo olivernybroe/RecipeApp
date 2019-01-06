@@ -23,7 +23,7 @@ class RecipesPage extends Page {
     FirebaseUser currentUser;
 
     RecipesPage(homeState) {
-        tabController = new TabController(length: MealSearch.values.length, vsync: homeState);
+        tabController = TabController(length: MealSearch.values.length, vsync: homeState);
         currentUser = homeState.currentUser;
     }
 
@@ -41,18 +41,15 @@ class RecipesPage extends Page {
 
     @override
     AppBar appBar(BuildContext context) {
-
         return new AppBar(
             //title: Text("Recipes"),
             title: TabBar(
                 controller: tabController,
                 isScrollable: true,
-                indicatorColor: Theme.of(context).primaryIconTheme.color,
                 tabs: MealSearch.values.map((MealType mealType) {
                     return Tab(
                         icon: Icon(
                             mealType.icon,
-                            color: Theme.of(context).primaryIconTheme.color,
                         ),
                     );
                 }).toList()
@@ -156,7 +153,11 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
                     ],
                 ),
             ),
-            child: RecipeCard(context, recipe),
+            child: RecipeCard(
+                context,
+                recipe,
+                currentUser: currentUser,
+            ),
             onDismissed: (DismissDirection direction) {
                 recipe.reference.delete();
             },

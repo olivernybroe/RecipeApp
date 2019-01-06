@@ -59,6 +59,7 @@ class MyApp extends StatelessWidget {
             title: '',
             home: _handleCurrentScreen(),
             theme: ThemeData(
+                indicatorColor: Colors.white70,
                 // Define the default Brightness and Colors
                 brightness: Brightness.light,
                 primaryColor: Color.fromRGBO(130,187,60, 1.0),
@@ -66,6 +67,9 @@ class MyApp extends StatelessWidget {
 
                 // Define the default Font Family
                 fontFamily: 'Montserrat',
+                tabBarTheme: TabBarTheme(
+                    labelColor: Colors.white70,
+                ),
 
                 iconTheme: IconThemeData(
                     //color: Colors.blue
@@ -86,12 +90,26 @@ class MyApp extends StatelessWidget {
                 // Define the default TextTheme. Use this to specify the default
                 // text styling for headlines, titles, bodies of text, and more.
                 textTheme: TextTheme(
-                    headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-                    title: TextStyle(),
-                    body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+                    headline: TextStyle(
+                        fontSize: 72.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
+                    ),
+                    title: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                    ),
+
+                    body1: TextStyle(
+                        fontSize: 14.0,
+                        fontFamily: 'Hind',
+                    ),
                 ),
                 primaryTextTheme: TextTheme(
-                    headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+                    headline: TextStyle(
+                        fontSize: 72.0,
+                        fontWeight: FontWeight.bold
+                    ),
                     title: TextStyle(color: Colors.white70),
                     body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
                 ),

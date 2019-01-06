@@ -51,6 +51,7 @@ class Recipe {
             'cook_time' : cookTime,
             'description' : description,
             'instructions' : instructions,
+            'ingredients' : ingredients,
         };
     }
 

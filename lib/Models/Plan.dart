@@ -1,62 +1,53 @@
 import 'package:MealEngineer/Models/Recipe.dart';
 import 'package:MealEngineer/services/FontAwesome/FontAwesome.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 
-class Plan {
-    List<Day> days;
-
-    Plan(this.days);
-
-
-    static Plan _now;
-
-    static Plan now({int forward = 5, int past = 1})
-    {
-        if(_now != null) {
-            return _now;
-        }
-
-        var now = DateTime.now();
-
-        // Generate list of days in the past
-        List<Day> days = List.generate(past, (index) {
-           return randomDay(now.subtract(Duration(days: index+1)));
-        });
-
-        // Add current day to list
-        days.add(randomDay(now));
-
-        // Then append a list of generated days in the future
-
-        days.addAll(List.generate(forward, (index) {
-            return randomDay(now.add(Duration(days: index+1)));
-
-        }));
-
-        return _now = Plan(days);
-    }
-
-    static Day randomDay(DateTime now) {
-        return Day(
-            now,
-            List.generate(Random().nextInt(10), (index) {
-                return Meal(
-                    Recipe.fromMap({'name' : 'test'}, "works"),
-                    MealType.values[index % 3]
-                );
-            })
-        );
-    }
-}
-
-class Day {
+class Meal {
+    String id;
+    Recipe recipe;
+    MealType mealType;
     DateTime day;
-    List<Meal> meals;
 
-    Day(this.day, this.meals);
+    DocumentReference reference;
+
+    Meal(this.day, this.recipe, this.mealType);
+
+    Meal.fromMap(Map<String, dynamic> map, this.id, DocumentSnapshot recipeSnapshot, {this.reference}) :
+            assert(map['day'] != null),
+            assert(map['mealType'] != null),
+            assert(map['recipe'] != null),
+            day = map['day'],
+            mealType = MealType.values.firstWhere((mealType) => mealType.name == map['mealType']),
+            recipe = Recipe.fromSnapshot(recipeSnapshot)
+    ;
+
+    Meal.fromSnapshot(DocumentSnapshot planSnapshot, DocumentSnapshot recipeSnapshot)
+        : this.fromMap(planSnapshot.data, planSnapshot.documentID, recipeSnapshot, reference: planSnapshot.reference);
+
+    @override
+    String toString() {
+        return 'Meal{day: $day}';
+    }
+
+    Future<DocumentReference> save(FirebaseUser user) {
+      return Firestore.instance.collection('users')
+          .document(user.uid).collection('plan')
+          .add(this.toMap());
+  }
+
+    Map<String, dynamic> toMap() {
+        return {
+            'day' : day,
+            'mealType' : mealType.name,
+            'recipe' : recipe.reference,
+        };
+    }
+
+
 }
 
 class MealType {
@@ -108,11 +99,4 @@ class MealType {
 
     @override
     int get hashCode => name.hashCode;
-}
-
-class Meal {
-    Recipe recipe;
-    MealType mealType;
-
-    Meal(this.recipe, this.mealType);
 }
