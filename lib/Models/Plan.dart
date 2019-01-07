@@ -100,3 +100,13 @@ class MealType {
     @override
     int get hashCode => name.hashCode;
 }
+
+class MealSearch {
+    static List<MealType> get values {
+        List<MealType> values = [
+            MealType('All', FontAwesomeIcons.utensilsSolid)
+        ];
+        values.addAll(MealType.values);
+        return values;
+    }
+}

@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
                 ),
 
                 iconTheme: IconThemeData(
-                    //color: Colors.blue
+                    //color: Colors.white70
                 ),
                 primaryIconTheme: IconThemeData(
                     color: Colors.white70//Color.fromRGBO(81, 139, 0, 1.0),
@@ -175,7 +175,7 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             RecipesPage(this),
             PlanPage(this),
             ShoppingListPage(),
-            ExplorePage(),
+            ExplorePage(this),
         ];
     }
 

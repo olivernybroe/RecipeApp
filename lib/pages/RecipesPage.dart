@@ -8,16 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MealEngineer/main.dart';
 import 'package:MealEngineer/pages/AddRecipe.dart';
 
-class MealSearch {
-    static List<MealType> get values {
-        List<MealType> values = [
-            MealType('All', FontAwesomeIcons.utensilsSolid)
-        ];
-        values.addAll(MealType.values);
-        return values;
-    }
-}
-
 class RecipesPage extends Page {
     TabController tabController;
     FirebaseUser currentUser;
@@ -41,18 +31,20 @@ class RecipesPage extends Page {
 
     @override
     AppBar appBar(BuildContext context) {
-        return new AppBar(
+        return AppBar(
             //title: Text("Recipes"),
-            title: TabBar(
-                controller: tabController,
-                isScrollable: true,
-                tabs: MealSearch.values.map((MealType mealType) {
-                    return Tab(
-                        icon: Icon(
-                            mealType.icon,
-                        ),
-                    );
-                }).toList()
+            title: Center(
+              child: TabBar(
+                  controller: tabController,
+                  isScrollable: true,
+                  tabs: MealSearch.values.map((MealType mealType) {
+                      return Tab(
+                          icon: Icon(
+                              mealType.icon,
+                          ),
+                      );
+                  }).toList()
+              ),
             ),
         );
     }
@@ -72,8 +64,6 @@ class RecipesPage extends Page {
             child: new Icon(Icons.add),
         );
     }
-
-
 }
 
 class _RecipesPage extends StatefulWidget {
@@ -97,8 +87,6 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
 
     @override
     bool get wantKeepAlive => true;
-
-    final Stream<FirebaseUser> userStream = auth.currentUser().asStream();
 
     @override
     Widget build(BuildContext context) {
@@ -174,12 +162,4 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
 
         return query.snapshots();
     }
-
-
-    @override
-    void initState() {
-        super.initState();
-    }
-
-
 }

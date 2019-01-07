@@ -167,13 +167,17 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                                     meals = mealSnapshot.data.documents
                                         .map((DocumentSnapshot snapshot) {
 
-                                        DocumentSnapshot recipeSnapshot = recipes.firstWhere(
-                                                (recipe) => recipe.documentID == snapshot.data['recipe'].documentID,
-                                            orElse: null
-                                        );
+                                            try {
+                                                DocumentSnapshot recipeSnapshot = recipes.firstWhere(
+                                                        (recipe) => recipe.documentID == snapshot.data['recipe'].documentID,
+                                                );
 
+                                                return Meal.fromSnapshot(snapshot, recipeSnapshot);
+                                            }
+                                            catch(exception) {
+                                                return null;
+                                            }
 
-                                        return Meal.fromSnapshot(snapshot, recipeSnapshot);
                                     }).toList();
                                 }
 
@@ -186,7 +190,7 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                                             context,
                                             mealType,
                                             day,
-                                            meals.where((Meal meal) => meal.mealType == mealType).toList()
+                                            meals.where((Meal meal) => meal?.mealType == mealType).toList()
                                         );
                                     }
                                 );

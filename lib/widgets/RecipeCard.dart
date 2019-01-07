@@ -9,8 +9,11 @@ class RecipeCard extends Card {
   final GestureTapCallback onTap;
   final BuildContext context;
   final FirebaseUser currentUser;
+  final bool isPublic;
 
-  RecipeCard(this.context, this.recipe, {this.onTap, this.currentUser});
+  RecipeCard(this.context, this.recipe, {this.onTap, this.currentUser, this.isPublic : false});
+
+  RecipeCard.public(this.context, this.recipe, this.currentUser, {this.onTap, this.isPublic : true});
 
   @override
   Widget get child => GestureDetector(
@@ -55,7 +58,30 @@ class RecipeCard extends Card {
 
   Widget _infoScreen(BuildContext context)
   {
-    return _RecipeInfoScreen(context, recipe, currentUser);
+    List<Widget> actions;
+    if(isPublic == true) {
+      actions = [
+        Builder(builder: (context) => IconButton(
+            icon: Icon(Icons.file_download),
+            onPressed: () {
+              recipe.addToCookBook(currentUser);
+              final snackBar = SnackBar(
+                content: Text('Added recipe to your cookbook'),
+              );
+
+              Scaffold.of(context).showSnackBar(snackBar);
+            }
+        ))
+      ];
+    }
+
+
+    return _RecipeInfoScreen(
+      context,
+      recipe,
+      currentUser,
+      actions: actions,
+    );
   }
 }
 
@@ -63,28 +89,67 @@ class _RecipeInfoScreen extends Scaffold {
   final Recipe recipe;
   final BuildContext context;
   final FirebaseUser currentUser;
+  final List<Widget> actions;
 
-  _RecipeInfoScreen(this.context, this.recipe, this.currentUser);
-
+  _RecipeInfoScreen(this.context, this.recipe, this.currentUser, {this.actions});
 
   @override
   PreferredSizeWidget get appBar => AppBar(
     title: Text(
       this.recipe.name,
     ),
-    actions: <Widget>[
-      Builder(builder: (context) => IconButton(
-        icon: Icon(Icons.edit),
-        onPressed: () {
-          final snackBar = SnackBar(
-            content: Text('Thank you for letting us know that you are instersted in a edit feature.'),
-          );
-
-          Scaffold.of(context).showSnackBar(snackBar);
-        }
-      )),
+    actions: actions ?? <Widget>[
+      _edit(),
+      _publishDialog(),
     ],
   );
+
+  Builder _edit() {
+    return Builder(builder: (context) => IconButton(
+      icon: Icon(Icons.edit),
+      onPressed: () {
+        final snackBar = SnackBar(
+          content: Text('Thank you for letting us know that you are instersted in a edit feature.'),
+        );
+
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+    ));
+  }
+
+  Builder _publishDialog() {
+    return Builder(builder: (context) => IconButton(
+      icon: Icon(Icons.public),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                this.recipe.public == null ? "Publish recipe?" : "Update published recipe",
+                style: TextStyle(color: Colors.black, fontSize: 24),
+              ),
+              content: Text("This will publish ${recipe.name} so other users can see the recipe. If it's already published it will update it."),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    this.recipe.publish(currentUser);
+                  },
+                  child: Text(this.recipe.public == null ? "Publish" : 'Update'),
+                ),
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Close'),
+                  textColor: Theme.of(context).disabledColor,
+                ),
+              ],
+            );
+          }
+        );
+      },
+    ));
+  }
 
   @override
   Widget get body => _fields(context);
@@ -193,10 +258,7 @@ class _RecipeInfoScreen extends Scaffold {
       );
     }
     else {
-      image = Container(
-        color: Colors.redAccent,
-        child: null,
-      );
+      return null;
     }
 
     return Container(
