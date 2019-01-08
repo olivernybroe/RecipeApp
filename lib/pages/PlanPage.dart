@@ -1,5 +1,6 @@
 import 'package:MealEngineer/Models/Plan.dart';
 import 'package:MealEngineer/main.dart';
+import 'package:MealEngineer/pages/AddRecipe.dart';
 import 'package:MealEngineer/widgets/ChooseRecipe.dart';
 import 'package:MealEngineer/widgets/RecipeCard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,7 +32,35 @@ class PlanPage extends Page {
     );
   }
 
-  @override
+    @override
+    Widget floatingActionButton(BuildContext context) {
+        return Builder(builder: (context) => FloatingActionButton(
+            tooltip: 'Add recipe to the plan.',
+            child: Icon(Icons.add),
+            onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChooseRecipe(
+                            context,
+                            currentUser
+                        ),
+                    )
+                ).then<Recipe>((recipe) {
+                    SnackBar snackBar = SnackBar(
+                        content: Text('Added ${recipe.name} to the plan.'),
+                    );
+
+                    Scaffold.of(context).showSnackBar(snackBar);
+
+                    Meal(dates().elementAt(tabController.index), recipe).save(currentUser);
+
+                });
+            },
+        ));
+    }
+
+    @override
   Widget pageView(BuildContext context) {
     return _PlanPage(tabController, currentUser);
   }
@@ -172,27 +201,20 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
                                                         (recipe) => recipe.documentID == snapshot.data['recipe'].documentID,
                                                 );
 
+
                                                 return Meal.fromSnapshot(snapshot, recipeSnapshot);
                                             }
                                             catch(exception) {
                                                 return null;
                                             }
 
-                                    }).toList();
+                                    }).where((meal) => meal != null).toList();
                                 }
 
-                                return ListView.builder(
-                                    itemCount: MealType.values.length,
-                                    itemBuilder: (BuildContext context, int index){
-                                        MealType mealType = MealType.values[index];
-
-                                        return _buildList(
-                                            context,
-                                            mealType,
-                                            day,
-                                            meals.where((Meal meal) => meal?.mealType == mealType).toList()
-                                        );
-                                    }
+                                return _buildList(
+                                    context,
+                                    day,
+                                    meals
                                 );
                             },
                         );
@@ -205,54 +227,24 @@ class _PlanState extends State<_PlanPage> with AutomaticKeepAliveClientMixin<_Pl
         );
     }
 
-    Widget _buildList(BuildContext context, MealType mealType, DateTime day, List<Meal> meals) {
-        return Column(
-            children: <Widget>[
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                        Text(
-                            mealType.name,
-                            style: TextStyle(
-                                //decoration: TextDecoration.underline,
-                                fontSize: 30.0,
-                                fontWeight: FontWeight.bold
-                            ),
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.add_circle_outline),
-                            onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ChooseRecipe(
-                                            context,
-                                            currentUser,
-                                            mealType
-                                        ),
-                                    )
-                                ).then<Recipe>((recipe) {
-
-
-                                    SnackBar snackBar = SnackBar(
-                                        content: Text('Added ${recipe.name} to the plan.'),
-                                    );
-
-                                    Scaffold.of(context).showSnackBar(snackBar);
-
-                                    Meal(day, recipe, mealType).save(currentUser);
-
-                                });
-                            }
-                        )
-                    ],
-                ),
-                Column(
-                    children: meals.map((data) => _buildListItem(context, data)).toList(),
+    Widget _buildList(BuildContext context, DateTime day, List<Meal> meals) {
+        if(meals.isEmpty) {
+            return Align(
+                alignment: Alignment.center,
+                child: Container(
+                    height: 160.0,
+                    width: 160.0,
+                    child: Text(
+                        "Press the icon in the right bottom corner to add a recipe to the plan.",
+                        style: TextStyle(color: Colors.black45),
+                    )
                 )
-
-            ],
-        );
+            );
+        } else {
+            return Column(
+                children: meals.map((data) => _buildListItem(context, data)).toList(),
+            );
+        }
     }
 
     Widget _buildListItem(BuildContext context, Meal meal) {

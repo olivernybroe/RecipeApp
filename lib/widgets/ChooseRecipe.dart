@@ -14,12 +14,12 @@ class ChooseRecipe extends Scaffold{
     final BuildContext context;
     final FirebaseUser currentUser;
 
-    ChooseRecipe(this.context, this.currentUser, this.mealType);
+    ChooseRecipe(this.context, this.currentUser, {this.mealType});
 
     @override
     PreferredSizeWidget get appBar => AppBar(
         title: Text(
-            "Add a recipe to your ${mealType.name.toLowerCase()}"
+            mealType != null ? "Add a recipe to your ${mealType.name.toLowerCase()}" : "Add a recipe to the plan"
         ),
     );
 

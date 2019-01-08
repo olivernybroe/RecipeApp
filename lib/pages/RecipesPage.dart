@@ -9,16 +9,18 @@ import 'package:MealEngineer/main.dart';
 import 'package:MealEngineer/pages/AddRecipe.dart';
 
 class RecipesPage extends Page {
-    TabController tabController;
+    TabController favoriteTabController;
+    TabController publicityTabController;
     FirebaseUser currentUser;
 
     RecipesPage(homeState) {
-        tabController = TabController(length: MealSearch.values.length, vsync: homeState);
+        favoriteTabController = TabController(length: MealSearch.values.length, vsync: homeState);
+        publicityTabController = TabController(length: 2, vsync: homeState);
         currentUser = homeState.currentUser;
     }
 
     Widget pageView(BuildContext context) {
-        return _RecipesPage(currentUser, tabController);
+        return _RecipesPage(currentUser, favoriteTabController, publicityTabController);
     }
 
     @override
@@ -32,19 +34,31 @@ class RecipesPage extends Page {
     @override
     AppBar appBar(BuildContext context) {
         return AppBar(
-            //title: Text("Recipes"),
-            title: Center(
-              child: TabBar(
-                  controller: tabController,
-                  isScrollable: true,
-                  tabs: MealSearch.values.map((MealType mealType) {
-                      return Tab(
-                          icon: Icon(
-                              mealType.icon,
-                          ),
-                      );
-                  }).toList()
-              ),
+            centerTitle: true,
+            title: TabBar(
+                indicatorPadding: EdgeInsets.all(8),
+                controller: publicityTabController,
+                tabs: [
+                    FlatButton(
+                        onPressed: null,
+                        child: Text('Favorites', style: Theme.of(context).textTheme.title)
+                    ),
+                    FlatButton(
+                        onPressed: null,
+                        child: Text('Public', style: Theme.of(context).textTheme.title)
+                    ),
+                ]
+            ),
+            bottom: TabBar(
+                controller: favoriteTabController,
+                isScrollable: true,
+                tabs: MealSearch.values.map((MealType mealType) {
+                    return Tab(
+                        icon: Icon(
+                            mealType.icon,
+                        ),
+                    );
+                }).toList()
             ),
         );
     }
@@ -61,28 +75,30 @@ class RecipesPage extends Page {
                 );
             },
             tooltip: 'Create a recipe',
-            child: new Icon(Icons.add),
+            child: Icon(Icons.add),
         );
     }
 }
 
 class _RecipesPage extends StatefulWidget {
-    final TabController tabController;
+    TabController favoriteTabController;
+    TabController publicityTabController;
     final FirebaseUser firebaseUser;
 
-    _RecipesPage(this.firebaseUser, this.tabController);
+    _RecipesPage(this.firebaseUser, this.favoriteTabController, this.publicityTabController);
 
     @override
     State<StatefulWidget> createState() {
-        return _RecipeState(firebaseUser, tabController);
+        return _RecipeState(firebaseUser, favoriteTabController, publicityTabController);
     }
 }
 
 class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixin<_RecipesPage> {
-    final TabController tabController;
+    TabController favoriteTabController;
+    TabController publicityTabController;
     final FirebaseUser currentUser;
 
-    _RecipeState(this.currentUser, this.tabController);
+    _RecipeState(this.currentUser, this.favoriteTabController, this.publicityTabController);
 
 
     @override
@@ -90,17 +106,37 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
 
     @override
     Widget build(BuildContext context) {
+
         return TabBarView(
-            controller: tabController,
-            children: MealSearch.values.map((MealType mealType) {
-                return _buildBody(context, mealType);
-            }).toList()
+            controller: publicityTabController,
+            children: <Widget>[
+                TabBarView(
+                    controller: favoriteTabController,
+                    children: MealSearch.values.map((MealType mealType) {
+                        return _buildBody(
+                            context,
+                            recipeStream(mealType, false),
+                            false
+                        );
+                    }).toList()
+                ),
+                TabBarView(
+                    controller: favoriteTabController,
+                    children: MealSearch.values.map((MealType mealType) {
+                        return _buildBody(
+                            context,
+                            recipeStream(mealType, true),
+                            true
+                        );
+                    }).toList()
+                ),
+            ],
         );
     }
 
-    Widget _buildBody(BuildContext context, MealType mealType) {
+    Widget _buildBody(BuildContext context, Stream<QuerySnapshot> query, bool public) {
         return StreamBuilder<QuerySnapshot>(
-            stream: recipeStream(mealType),
+            stream: query,
             builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                     return Align(
@@ -113,48 +149,62 @@ class _RecipeState extends State<_RecipesPage> with AutomaticKeepAliveClientMixi
                     );
                 }
 
-                return _buildList(context, snapshot.data.documents);
+                return _buildList(context, snapshot.data.documents, public);
             },
         );
     }
 
-    Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot, bool public) {
         return ListView(
-            children: snapshot.map((data) => _buildListItem(context, data)).toList(),
+            children: snapshot.map((data) => _buildListItem(context, data, public)).toList(),
         );
     }
 
-    Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+    Widget _buildListItem(BuildContext context, DocumentSnapshot data, bool public) {
         final recipe = Recipe.fromSnapshot(data);
-        return Dismissible(
-            direction: DismissDirection.endToStart,
-            key: Key(recipe.id),
-            background: Container(
-                color: Colors.redAccent,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                        Text("DELETE", style: TextStyle(color: Colors.white),),
-                        Padding(padding: EdgeInsets.all(8.0),),
-                        Icon(Icons.delete, color: Colors.white,),
-                        Padding(padding: EdgeInsets.all(8.0),),
-                    ],
+        if(public == false) {
+            return Dismissible(
+                direction: DismissDirection.endToStart,
+                key: Key(recipe.id),
+                background: Container(
+                    color: Colors.redAccent,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                            Text("DELETE", style: TextStyle(color: Colors.white),),
+                            Padding(padding: EdgeInsets.all(8.0),),
+                            Icon(Icons.delete, color: Colors.white,),
+                            Padding(padding: EdgeInsets.all(8.0),),
+                        ],
+                    ),
                 ),
-            ),
-            child: RecipeCard(
-                context,
-                recipe,
-                currentUser: currentUser,
-            ),
-            onDismissed: (DismissDirection direction) {
-                recipe.reference.delete();
-            },
+                child: RecipeCard(
+                    context,
+                    recipe,
+                    currentUser: currentUser,
+                ),
+                onDismissed: (DismissDirection direction) {
+                    recipe.reference.delete();
+                },
+            );
+        }
+
+        return RecipeCard.public(
+            context,
+            recipe,
+            currentUser,
         );
     }
 
-    Stream<QuerySnapshot> recipeStream(MealType mealType) {
-        var query = Firestore.instance.collection('users')
-            .document(currentUser.uid).collection('recipes');
+    Stream<QuerySnapshot> recipeStream(MealType mealType, bool public) {
+        CollectionReference query;
+
+        if(public == false) {
+            query = Firestore.instance.collection('users')
+                .document(currentUser.uid).collection('recipes');
+        } else {
+            query = Firestore.instance.collection('recipes');
+        }
 
         if(mealType.name != 'All') {
             return query.where('mealType', arrayContains: mealType.name).snapshots();

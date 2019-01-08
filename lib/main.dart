@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:MealEngineer/pages/ExplorePage.dart';
 import 'package:MealEngineer/pages/LoginPage.dart';
 import 'package:MealEngineer/pages/PlanPage.dart';
 import 'package:MealEngineer/pages/ShoppingListPage.dart';
@@ -175,7 +174,6 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             RecipesPage(this),
             PlanPage(this),
             ShoppingListPage(),
-            ExplorePage(this),
         ];
     }
 

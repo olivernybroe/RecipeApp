@@ -2,6 +2,7 @@ import 'package:MealEngineer/Models/Recipe.dart';
 import 'package:MealEngineer/services/FontAwesome/FontAwesome.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
@@ -14,14 +15,13 @@ class Meal {
 
     DocumentReference reference;
 
-    Meal(this.day, this.recipe, this.mealType);
+    Meal(this.day, this.recipe, {this.mealType});
 
     Meal.fromMap(Map<String, dynamic> map, this.id, DocumentSnapshot recipeSnapshot, {this.reference}) :
             assert(map['day'] != null),
-            assert(map['mealType'] != null),
             assert(map['recipe'] != null),
             day = map['day'],
-            mealType = MealType.values.firstWhere((mealType) => mealType.name == map['mealType']),
+            mealType = MealType.values.firstWhere((mealType) => mealType.name == map['mealType'], orElse: () => null),
             recipe = Recipe.fromSnapshot(recipeSnapshot)
     ;
 
@@ -42,7 +42,7 @@ class Meal {
     Map<String, dynamic> toMap() {
         return {
             'day' : day,
-            'mealType' : mealType.name,
+            'mealType' : mealType?.name,
             'recipe' : recipe.reference,
         };
     }
@@ -61,7 +61,7 @@ class MealType {
     );
     static final MealType dinner = MealType(
         'Dinner',
-        FontAwesomeIcons.turkeySolid
+        FontAwesomeIcons.utensilsSolid
     );
     static final MealType desert = MealType(
         'Desert',
@@ -103,8 +103,8 @@ class MealType {
 
 class MealSearch {
     static List<MealType> get values {
-        List<MealType> values = [
-            MealType('All', FontAwesomeIcons.utensilsSolid)
+        final List<MealType> values = [
+            MealType('All', Icons.book)
         ];
         values.addAll(MealType.values);
         return values;
