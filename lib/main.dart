@@ -153,11 +153,31 @@ abstract class Page {
     BottomNavigationBarItem navigationBarItem(BuildContext context);
 
     AppBar appBar(BuildContext context) {
-        return new AppBar();
+        return AppBar(
+            actions: appBarActions(context),
+        );
     }
 
     Widget floatingActionButton(BuildContext context) {
         return null;
+    }
+
+    List<Widget> appBarActions(BuildContext context) {
+        return <Widget>[
+            PopupMenuButton(
+                onSelected: (value) {
+                    if(value == 'Log out') {
+                        FirebaseAuth.instance.signOut();
+                    }
+                },
+                itemBuilder: (context) => [
+                    PopupMenuItem(
+                        value: "Log out",
+                        child: Text("Log out")
+                    )
+                ]
+            ),
+        ];
     }
 }
 

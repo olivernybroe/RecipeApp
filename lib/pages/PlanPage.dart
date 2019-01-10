@@ -19,7 +19,7 @@ class PlanPage extends Page {
         tabController = TabController(
             length: dates().length,
             vsync: homeState,
-            initialIndex: 1
+            initialIndex: 5
         );
         currentUser = homeState.currentUser;
     }
@@ -94,7 +94,7 @@ class PlanPage extends Page {
 
   static List<DateTime> _dates;
 
-  static List<DateTime> dates({int forward = 5, int past = 1}) {
+  static List<DateTime> dates({int forward = 10, int past = 5}) {
       if(_dates != null) {
           return _dates;
       }
@@ -109,7 +109,7 @@ class PlanPage extends Page {
       // Generate list of days in the past
       List<DateTime> days = List.generate(past, (index) =>
           now.subtract(Duration(days: index+1))
-      );
+      ).reversed.toList();
 
       // Add current day to list
       days.add(now);

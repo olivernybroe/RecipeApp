@@ -13,7 +13,7 @@ class RecipesPage extends Page {
     TabController publicityTabController;
     FirebaseUser currentUser;
 
-    RecipesPage(homeState) {
+    RecipesPage(HomeState homeState) {
         favoriteTabController = TabController(length: MealSearch.values.length, vsync: homeState);
         publicityTabController = TabController(length: 2, vsync: homeState);
         currentUser = homeState.currentUser;
@@ -34,6 +34,7 @@ class RecipesPage extends Page {
     @override
     AppBar appBar(BuildContext context) {
         return AppBar(
+            actions: appBarActions(context),
             centerTitle: true,
             title: TabBar(
                 indicatorPadding: EdgeInsets.all(8),
@@ -65,7 +66,7 @@ class RecipesPage extends Page {
 
     @override
     Widget floatingActionButton(BuildContext context) {
-        return new FloatingActionButton(
+        return FloatingActionButton(
             onPressed: () {
                 Navigator.push(
                     context,

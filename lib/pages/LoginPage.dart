@@ -19,7 +19,7 @@ class _LoginState extends State<LoginPage> {
       appBar: null,
       body: Column(
           children: <Widget>[
-              Image.asset('images/icon.png'),
+              Image.asset('assets/images/icon.png'),
               RaisedButton.icon(
                   color: Color(0xFFDD4B39),
                   textColor: Colors.white,
