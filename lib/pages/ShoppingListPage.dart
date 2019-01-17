@@ -66,6 +66,23 @@ class _ShoppingList {
     _ShoppingList.fromSnapshot(DocumentSnapshot shoppingListSnapshot)
         : this.fromMap(shoppingListSnapshot.data, shoppingListSnapshot.documentID, reference: shoppingListSnapshot.reference);
 
+
+    _ShoppingList.example(FirebaseUser user) {
+        name = "Shopping list";
+        checked = [
+            _Item(0, '1kg potatos')
+        ];
+        unchecked = [
+            _Item(1, '2kg carrots'),
+            _Item(2, '2pck bread')
+        ];
+
+        Firestore.instance.collection('users')
+            .document(user .uid).collection('shoppingList').add(toMap())
+            .then((ref) => reference = ref);
+
+    }
+
     Map<String, dynamic> toMap() => {
         'name' : name,
         'checked' : checked.map((item) => item.toString()).toList(),
@@ -179,7 +196,13 @@ class _ShoppingListState extends State<_ShoppingListPage> {
                             (document) => _ShoppingList.fromSnapshot(document)
                     ).toList();
 
-                    _ShoppingList list = page.selectedValue ?? shoppingLists.first;
+                    _ShoppingList list;
+                    try {
+                        list = page.selectedValue ?? shoppingLists.first;
+                    }
+                    catch(exception) {
+                        list = _ShoppingList.example(page.currentUser);
+                    }
 
                     // Create an array of items from the shopping list.
                     List<Widget> items = list.unchecked.map(
