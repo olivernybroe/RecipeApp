@@ -1,0 +1,2 @@
+Added shopping list functionality
+Updated the icon for recipes found publicly
