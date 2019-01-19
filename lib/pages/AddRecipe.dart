@@ -14,8 +14,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class AddRecipe extends StatefulWidget {
   final FirebaseUser currentUser;
-  final FirebaseStorage _storage = FirebaseStorage(storageBucket: 'gs://recipe-4941e.appspot.com');
-
 
   AddRecipe(this.currentUser);
 
@@ -26,7 +24,6 @@ class AddRecipe extends StatefulWidget {
 class _AddRecipeState extends State<AddRecipe> {
 
   final FirebaseUser currentUser;
-  FirebaseStorage _storage = FirebaseStorage.instance;
 
   _AddRecipeState(this.currentUser);
 
