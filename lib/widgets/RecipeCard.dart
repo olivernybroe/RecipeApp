@@ -62,7 +62,7 @@ class RecipeCard extends Card {
     if(isPublic == true) {
       actions = [
         Builder(builder: (context) => IconButton(
-            icon: Icon(Icons.file_download),
+            icon: Icon(Icons.favorite),
             onPressed: () {
               recipe.addToCookBook(currentUser);
               final snackBar = SnackBar(

@@ -193,7 +193,7 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
         pages = [
             RecipesPage(this),
             PlanPage(this),
-            ShoppingListPage(),
+            ShoppingListPage(this),
         ];
     }
 
