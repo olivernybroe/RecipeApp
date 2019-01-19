@@ -8,11 +8,14 @@ import 'package:MealEngineer/Models/Recipe.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 class AddRecipe extends StatefulWidget {
   final FirebaseUser currentUser;
+  final FirebaseStorage _storage = FirebaseStorage(storageBucket: 'gs://recipe-4941e.appspot.com');
+
 
   AddRecipe(this.currentUser);
 
@@ -23,6 +26,7 @@ class AddRecipe extends StatefulWidget {
 class _AddRecipeState extends State<AddRecipe> {
 
   final FirebaseUser currentUser;
+  FirebaseStorage _storage = FirebaseStorage.instance;
 
   _AddRecipeState(this.currentUser);
 
@@ -32,8 +36,7 @@ class _AddRecipeState extends State<AddRecipe> {
   Recipe _recipeModel = Recipe();
 
   bool _isExpanded = false;
-  String _selected;
-  HashMap<String, bool> _selected1 = HashMap<String, bool>();
+  HashMap<String, bool> _selected = HashMap<String, bool>();
 
   List<String> ingredients = [];
   List<TextFormField> _ingredientFields = [];
@@ -45,14 +48,14 @@ class _AddRecipeState extends State<AddRecipe> {
     _categories = [];
     for (MealType category in MealType.values) {
       String cat = category.name;
-      _selected1.putIfAbsent(cat, () => false);
+      _selected.putIfAbsent(cat, () => false);
 
       _categories.add(new ListTile(
         leading: Checkbox(
-            value: _selected1[cat],
+            value: _selected[cat],
             onChanged: (bool value) {
               setState(() {
-                _selected1[cat] = value;
+                _selected[cat] = value;
               });
             },
             key: Key(cat)),
@@ -87,7 +90,7 @@ class _AddRecipeState extends State<AddRecipe> {
                       enabled: false,
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          labelText: 'Select a category',
+                          labelText: 'Meal type',
                           prefixIcon: Icon(
                             Icons.category,
                           )
@@ -206,23 +209,18 @@ class _AddRecipeState extends State<AddRecipe> {
               //validator: (input) => input.length == 0 ? 'You must give a description of your recipe' : null,
               onSaved: (input) => _recipeModel.instructions = input,
             ),
-/*
-            RaisedButton(
-              onPressed: () {
-                _optionsDialogBox();
-              },
-            ),
 
-            _image != null ? Image.file(_image) : Text('No image selected'),
-*/
+            _image != null ?
+                GestureDetector(
+                  child: _cameraUploaded(true),
+                ) :
+            _cameraUploaded(false),
+
+
       ],
         ),
       ),
     );
-
-    picker() {
-      print('Picker is called');
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -247,43 +245,40 @@ class _AddRecipeState extends State<AddRecipe> {
         ],
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: picker,
+        onPressed: _optionsDialogBox,
         child: new Icon(Icons.camera_alt),
       ),
     );
   }
 
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: color),
-        Container(
-          margin: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.w400,
-              color: color,
-            ),
-          ),
-        ),
-      ],
-    );
+  Future<String> uploadImage(File image) async {
+    String path = 'images/' + this.currentUser.uid + '/' + DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference reference = FirebaseStorage.instance.ref().child(path);
+    StorageUploadTask uploader = reference.putFile(image);
+
+    var downloadUrl = await (await uploader.onComplete).ref.getDownloadURL();
+    String url = downloadUrl.toString();
+
+    return url;
   }
 
-  void _submit(BuildContext context) {
+  MealType getMealType(String meal) {
+    return MealType.values.firstWhere((mealType) => mealType.name == meal);
+  }
+
+  void _submit(BuildContext context) async {
+
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      // Couldn't add validator to dropdown menu..
-      if (_selected != null) {
-        _recipeModel.mealTypes.add(
-            MealType.values.firstWhere((mealType) => mealType.name == _selected)
-        );
+      _recipeModel.mealTypes.clear();
+      _selected.forEach((key, val) => val ? _recipeModel.mealTypes.add(getMealType(key)) : null);
+
+      if(_image != null) {
+        String url = await uploadImage(_image);
+        _recipeModel.imageUrl = url;
       }
+
       _recipeModel.save(
           Firestore.instance.collection('users')
               .document(currentUser.uid).collection('recipes')
@@ -329,7 +324,51 @@ class _AddRecipeState extends State<AddRecipe> {
   List<Widget> listIngredientFields() {
     return _ingredientFields;
   }
-/*
+
+  ListTile _cameraUploaded(bool picture) {
+    String message = picture ? 'Picture provided' : 'Missing picture';
+    IconData icon = picture ? Icons.check : Icons.notification_important;
+
+    return ListTile(
+      title: Text(message),
+      subtitle: picture ? GestureDetector(child: Text('Click to remove', style: TextStyle(color: Colors.red)), onTap: _removeImage) : null,
+      leading: Icon(icon)
+    );
+  }
+
+  Future<void> _removeImage() {
+    return showDialog(context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: new SingleChildScrollView(
+              child: new ListBody(
+                children: <Widget>[
+                  Center(child: Text('Please confirm removal of picture')),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      RaisedButton( onPressed: () {
+                        Navigator.pop(context);
+                      },child: Text('Cancel', style: TextStyle(color: Colors.white)),
+                        color: Theme.of(context).accentColor,
+                      ),
+                      RaisedButton( onPressed: () {
+                        setState(() {
+                          Navigator.pop(context);
+                          _image = null;
+                        });
+                      },
+                        child: Text('Remove', style: TextStyle(color: Colors.white)),
+                        color: Theme.of(context).accentColor,)
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   Future<void> _optionsDialogBox() {
     return showDialog(context: context,
         builder: (BuildContext context) {
@@ -338,17 +377,25 @@ class _AddRecipeState extends State<AddRecipe> {
               child: new ListBody(
                 children: <Widget>[
                   RaisedButton(
+                    child: Text('Camera',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     onPressed: () {
-                      getImage();
+                      Navigator.pop(context);
+                      openCamera();
                     },
+                    color: Theme.of(context).accentColor,
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                  ),
-                  GestureDetector(
-                    child: new Text('Select from gallery'),
-                    //onTap: openGallery,
-                  ),
+                  RaisedButton(
+                    child: Text('Gallery',
+                        style: TextStyle(color: Colors.white)
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      openGallery();
+                    },
+                    color: Theme.of(context).accentColor,
+                  )
                 ],
               ),
             ),
@@ -364,15 +411,7 @@ class _AddRecipeState extends State<AddRecipe> {
     setState(() {
       _image = image;
     });
-    debugPrint("hello");
-  }
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      _image = image;
-    });
   }
 
   Future openGallery() async {
@@ -384,5 +423,4 @@ class _AddRecipeState extends State<AddRecipe> {
       _image = image;
     });
   }
-  */
 }
