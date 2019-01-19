@@ -220,6 +220,10 @@ class _AddRecipeState extends State<AddRecipe> {
       ),
     );
 
+    picker() {
+      print('Picker is called');
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -241,6 +245,10 @@ class _AddRecipeState extends State<AddRecipe> {
         children: [
           addRecipeSection,
         ],
+      ),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: picker,
+        child: new Icon(Icons.camera_alt),
       ),
     );
   }
