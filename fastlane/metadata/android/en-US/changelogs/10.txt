@@ -1,0 +1,2 @@
+Added support for selection multiple categories when creating a recipe
+Added support for adding a image when creating a recipe

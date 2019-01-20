@@ -43,8 +43,8 @@ class Recipe {
     @override
     String toString() => "Recipe<$name>";
 
-    save(CollectionReference collection) {
-        collection.add(this.toMap());
+    Future<DocumentReference> save(CollectionReference collection) {
+        return collection.add(this.toMap());
     }
 
     Future<dynamic> publish(FirebaseUser user) {

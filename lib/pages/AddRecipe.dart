@@ -271,15 +271,16 @@ class _AddRecipeState extends State<AddRecipe> {
       _recipeModel.mealTypes.clear();
       _selected.forEach((key, val) => val ? _recipeModel.mealTypes.add(getMealType(key)) : null);
 
-      if(_image != null) {
-        String url = await uploadImage(_image);
-        _recipeModel.imageUrl = url;
-      }
-
       _recipeModel.save(
           Firestore.instance.collection('users')
               .document(currentUser.uid).collection('recipes')
-      );
+      ).then((ref) {
+        uploadImage(_image).then((url) {
+          ref.updateData({
+            'image' : url
+          });
+        });
+      });
 
       Navigator.pop(context);
     }
